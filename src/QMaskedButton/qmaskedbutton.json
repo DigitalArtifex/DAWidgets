@@ -1,0 +1,11 @@
+{
+    "Name" : "QMaskedButton",
+    "Version" : "1.0.0",
+    "CompatVersion" : "1.0.0",
+    "Vendor" : "DigitalArtifex",
+    "Copyright" : "(C)2025 James Dudeck",
+    "License" : "GPL v3 license.",
+    "Category" : "Qt Creator",
+    "Description" : "This plugin provides a convenient way to make complex buttons out of images",
+    "Url" : ""
+}

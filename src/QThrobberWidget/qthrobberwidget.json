@@ -1,0 +1,11 @@
+{
+    "Name" : "QThrobberWidget",
+    "Version" : "1.0.0",
+    "CompatVersion" : "1.0.0",
+    "Vendor" : "DigitalArtifex",
+    "Copyright" : "(C) James Dudeck",
+    "License" : "GPL v3 license.",
+    "Category" : "Qt Creator",
+    "Description" : "This plugin presents a Loading Throbber Widget",
+    "Url" : ""
+}
