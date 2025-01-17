@@ -22,6 +22,9 @@ QGaugeWidget::QGaugeWidget(QWidget *parent, Mode mode) : QWidget(parent)
     m_progressBarFillPen.setWidth(m_pathWidth);
     m_progressBarFillPen.setColor(m_progressBarFillColor);
     m_progressBarFillPen.setCapStyle(Qt::FlatCap);
+
+    int id = QFontDatabase::addApplicationFont("://src/QGaugeWidget/fonts/digital-7(mono).ttf");
+    m_fontFamily = QFontDatabase::applicationFontFamilies(id).at(0);
 }
 
 QGaugeWidget::~QGaugeWidget()
