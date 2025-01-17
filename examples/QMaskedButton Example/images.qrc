@@ -1,0 +1,31 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/ui/toolhead/home_clicked.png</file>
+        <file>images/ui/toolhead/home_default.png</file>
+        <file>images/ui/toolhead/home_hover.png</file>
+        <file>images/ui/toolhead/x_down_control_image_clicked.png</file>
+        <file>images/ui/toolhead/x_down_control_image_hover.png</file>
+        <file>images/ui/toolhead/x_down_control_image.png</file>
+        <file>images/ui/toolhead/x_down_control_mask.png</file>
+        <file>images/ui/toolhead/x_up_control_image_clicked.png</file>
+        <file>images/ui/toolhead/x_up_control_image_hover.png</file>
+        <file>images/ui/toolhead/x_up_control_image.png</file>
+        <file>images/ui/toolhead/x_up_control_mask.png</file>
+        <file>images/ui/toolhead/y_down_control_image_clicked.png</file>
+        <file>images/ui/toolhead/y_down_control_image_hover.png</file>
+        <file>images/ui/toolhead/y_down_control_image.png</file>
+        <file>images/ui/toolhead/y_down_control_mask.png</file>
+        <file>images/ui/toolhead/y_up_control_image_clicked.png</file>
+        <file>images/ui/toolhead/y_up_control_image_hover.png</file>
+        <file>images/ui/toolhead/y_up_control_image.png</file>
+        <file>images/ui/toolhead/y_up_control_mask.png</file>
+        <file>images/ui/toolhead/z_down_control_image_clicked.png</file>
+        <file>images/ui/toolhead/z_down_control_image_hover.png</file>
+        <file>images/ui/toolhead/z_down_control_image.png</file>
+        <file>images/ui/toolhead/z_down_control_mask.png</file>
+        <file>images/ui/toolhead/z_up_control_image_clicked.png</file>
+        <file>images/ui/toolhead/z_up_control_image_hover.png</file>
+        <file>images/ui/toolhead/z_up_control_image.png</file>
+        <file>images/ui/toolhead/z_up_control_mask.png</file>
+    </qresource>
+</RCC>
