@@ -10,3 +10,70 @@ A collection of Qt widgets packaged as a QtCreator plugin
 
 ## Installation (Windows)
 While this plugin will also work on Windows, the installation script is not currently provided. Follow the first 2 steps from the Linux instructions then manually copy the headers to the `QTINSTALLPATH/VERSION/ARCH/include/DigitalArtifex` directory, then the libraries to both `QTINSTALLPATH/VERSION/ARCH/lib` and `QTINSTALLPATH/Tools/QtCreator/lib/Qt/plugins/designer/`. If you want it to work with the stand-alone designer, the libraries will also need to be copied to `QTINSTALLPATH/VERSION/ARCH/plugins/designer`
+
+## Usage
+This plugin has not yet been setup as a QtModule, so you will need to manually link the library by adding the following line to your `.pro` file. This means you will also have to remain on the version you compiled the plugin for, or copy the libraries to a common lib directory
+
+``` C++
+LIBS += -L$$[QT_HOST_LIBS] -ldigitalartifexwidgets
+```
+
+### QGaugeWidget
+``` C++
+    m_temperatureGauge = new QGaugeWidget(this, QGaugeWidget::Temperature);
+    m_temperatureGauge->setFixedSize(150,150);
+    m_temperatureGauge->setIconSize(QSize(36,36));
+    m_temperatureGauge->setIcon(QIcon(":/icons/temperature.png"));
+    m_temperatureGauge->setMaximum(100);
+    m_temperatureLayout->addWidget(m_temperatureGauge);
+```
+
+QGaugeWidget supports the display format for temperature, percentage and raw values by passing either `QGaugeWidget::Temperature`, `QGaugeWidget::Percent` or `QGaugeWidget::Value` to the constructor as the Mode flag.
+
+<table>
+<tr>
+<th> Temperature </th>
+<th> Percentage </th>
+<th> Raw Value </th>
+</tr>
+<tr>
+<td>
+<img src="https://github.com/DigitalArtifex/QGaugeWidget/blob/main/images/screenshot.png" />
+</td>
+<td>
+<img src="https://github.com/DigitalArtifex/QGaugeWidget/blob/main/images/percent.png" />
+</td>
+<td>
+<img src="https://github.com/DigitalArtifex/QGaugeWidget/blob/main/images/value.png" />
+</td>
+</tr>
+</table>
+
+#### Icons
+
+Icons can either be a QIcon object or an animated GIF. If you prefer to use an animated GIF as an icon use `QGaugeWidget::setAnimatedIcon` with the URI of the GIF
+
+``` C++
+    m_temperatureGauge->setAnimatedIcon(":/icons/temperature.gif");
+```
+
+#### Customization
+
+Typical customization for font, text color, background color, icon size etc are available through their respective setter functions and can be customized via QSS.
+
+You can also set the pen style of the bar and fill if you want dashed lines etc
+
+![alt text](https://github.com/DigitalArtifex/QGaugeWidget/blob/main/images/pen-style.png)
+
+``` C++
+    m_temperatureGaugePen.setCapStyle(Qt::FlatCap);
+    m_temperatureGaugePen.setColor(m_temperatureGaugeColor);
+    m_temperatureGaugePen.setWidth(m_pathWidth + 4);
+    m_temperatureGauge->setProgressBarPen(m_temperatureGaugePen);
+
+    m_temperatureGaugeFillPen.setWidth(m_pathWidth);
+    m_temperatureGaugeFillPen.setColor(m_temperatureGaugeFillColor);
+    m_temperatureGaugeFillPen.setCapStyle(Qt::FlatCap);
+    m_temperatureGaugeFillPen.setStyle(Qt::DashDotDotLine);
+    m_temperatureGauge->setProgressBarFillPen(m_temperatureGaugeFillPen);
+```
