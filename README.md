@@ -19,14 +19,6 @@ LIBS += -L$$[QT_HOST_LIBS] -ldigitalartifexwidgets
 ```
 
 ### QGaugeWidget
-``` C++
-    m_temperatureGauge = new QGaugeWidget(this, QGaugeWidget::Temperature);
-    m_temperatureGauge->setFixedSize(150,150);
-    m_temperatureGauge->setIconSize(QSize(36,36));
-    m_temperatureGauge->setIcon(QIcon(":/icons/temperature.png"));
-    m_temperatureGauge->setMaximum(100);
-    m_temperatureLayout->addWidget(m_temperatureGauge);
-```
 
 QGaugeWidget supports the display format for temperature, percentage and raw values by passing either `QGaugeWidget::Temperature`, `QGaugeWidget::Percent` or `QGaugeWidget::Value` to the constructor as the Mode flag.
 
@@ -48,6 +40,15 @@ QGaugeWidget supports the display format for temperature, percentage and raw val
 </td>
 </tr>
 </table>
+
+``` C++
+    m_temperatureGauge = new QGaugeWidget(this, QGaugeWidget::Temperature);
+    m_temperatureGauge->setFixedSize(150,150);
+    m_temperatureGauge->setIconSize(QSize(36,36));
+    m_temperatureGauge->setIcon(QIcon(":/icons/temperature.png"));
+    m_temperatureGauge->setMaximum(100);
+    m_temperatureLayout->addWidget(m_temperatureGauge);
+```
 
 #### Icons
 
@@ -77,6 +78,50 @@ You can also set the pen style of the bar and fill if you want dashed lines etc
     m_temperatureGaugeFillPen.setStyle(Qt::DashDotDotLine);
     m_temperatureGauge->setProgressBarFillPen(m_temperatureGaugeFillPen);
 ```
+
+### QIndicatorWidget
+Customizable status indicator widget
+
+![alt text](https://github.com/DigitalArtifex/DigitalArtifexWidgets/blob/main/images/qindicatorwidget.png)
+
+### Usage example
+``` C++
+    ui->indicatorWidget->setIndicatorBackgroundColor(QColor(0,0,0));
+    ui->indicatorWidget->setIndicatorColor(QColor(48,183,224));
+    ui->indicatorWidget->setState(QIndicatorWidget::State::Blinking);
+```
+### QMaskedButton
+A button widget that converts images with an alpha channel into a boundary masked button.
+
+![alt text](https://github.com/DigitalArtifex/DigitalArtifexWidgets/blob/main/images/qmaskedbutton.png)
+
+### Example
+Each button requires 3 images. One for the normal state, one for the hover state and one for the clicked state. Disabled state is just the normal state at 50% opacity
+
+``` C++
+    ui->xDownButton->setPixmap(xDownImage);
+    ui->xDownButton->setClickPixmap(xDownClickedImage);
+    ui->xDownButton->setHoverPixmap(xDownHoverImage);
+    ui->xDownButton->setFixedSize(317, 218);
+    connect(m_xDownButton, SIGNAL(clicked()), this, SLOT(onXDownButtonClicked()));
+```
+
+In this example, multiple QMaskedButtons are stacked on the same geometry (0,0,317,218) and each button's image only has image data in their respective locations. The mask for the buttons is generated automatically based on the normal state's pixmap.
+<table>
+<tr>
+<th> X-Up Image </th>
+<th> X-Down Image </th>
+</tr>
+<tr>
+<td>
+<img src="https://github.com/DigitalArtifex/Flo/blob/main/images/ui/toolhead/x_up_control_image.png" />
+</td>
+<td>
+<img src="https://github.com/DigitalArtifex/Flo/blob/main/images/ui/toolhead/x_down_control_image.png" />
+</td>
+</tr>
+</table>
+
 ### QThrobber
 Customizable throbber widget for Qt that uses QPainter rather than gifs to provide a clean and undistorted indicator. The throbber rotates, shrinks and grows as a helpful way to indiciate a state of busyness, loading or processing.
 
