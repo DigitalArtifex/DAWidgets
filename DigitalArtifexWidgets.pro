@@ -34,7 +34,7 @@ header_files.files -= digitalartifexwidgets.h
 header_files.path = $$[QT_INSTALL_HEADERS]/DigitalArtifexWidgets/
 INSTALLS += header_files
 
-lib_files.files = libdigitalartifexwidgets.so libdigitalartifexwidgets.so.debug
+lib_files.files = $$OUT_PWD/libdigitalartifexwidgets.so $$OUT_PWD/libdigitalartifexwidgets.so.debug
 lib_files.path = $$[QT_HOST_LIBS]/
 INSTALLS += lib_files
 
