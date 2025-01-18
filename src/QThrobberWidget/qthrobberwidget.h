@@ -10,6 +10,8 @@
 
 #include "dalib_global.h"
 
+#include "qthrobberwidgetprivate.h"
+
 class DA_EXPORT QThrobberWidget : public QWidget {
         Q_OBJECT
     public:
@@ -58,16 +60,6 @@ class DA_EXPORT QThrobberWidget : public QWidget {
 
         Speed speed() const;
 
-        qreal throbberLength() const;
-
-        qreal iconScale() const;
-
-        qreal iconOpacity() const;
-
-        qreal throbberRotation() const;
-
-        qreal innerThrobberRotation() const;
-
     public slots:
 
         void setFontSize(qreal fontSize);
@@ -96,21 +88,18 @@ class DA_EXPORT QThrobberWidget : public QWidget {
 
         void setSpeed(Speed speed);
 
-        void setThrobberRotation(qreal throbberRotation);
-
-        void setInnerThrobberRotation(qreal innerThrobberRotation);
-
         void setIsPlaying(bool isPlaying);
-
-        void setThrobberLength(qreal throbberLength);
-
-        void setIconScale(qreal iconScale);
-
-        void setIconOpacity(qreal iconOpacity);
 
     protected slots:
         void onAnimationGroupFinished();
         void onSecondaryAnimationGroupFinished();
+
+        void onThrobberRotationChanged();
+        void onInnerThrobberRotationChanged();
+        void onThrobberLengthChanged();
+
+        void onIconScaleChanged();
+        void onIconOpacityChanged();
 
     signals:
 
@@ -120,17 +109,7 @@ class DA_EXPORT QThrobberWidget : public QWidget {
 
         void iconChanged();
 
-        void throbberRotationChanged();
-
-        void innerThrobberRotationChanged();
-
         void isPlayingChanged();
-
-        void throbberLengthChanged();
-
-        void iconScaleChanged();
-
-        void iconOpacityChanged();
 
         void throbberColorChanged();
 
@@ -159,9 +138,7 @@ class DA_EXPORT QThrobberWidget : public QWidget {
         virtual void resizeEvent(QResizeEvent *event) override;
 
     private:
-        qreal m_throbberRotation = 0;
-        qreal m_throbberLength = -270;
-        qreal m_innerThrobberRotation = (360 * 16);
+        QThrobberWidgetPrivate *m_private;
 
         QPropertyAnimation *m_throbberRotationAnimation = nullptr;
         QPropertyAnimation *m_throbberLengthAnimation = nullptr;
@@ -173,8 +150,6 @@ class DA_EXPORT QThrobberWidget : public QWidget {
 
         QString m_fontFamily;
         qreal m_fontSize = 12;
-        qreal m_iconScale = 1;
-        qreal m_iconOpacity = 1;
 
         int m_throbberWidth = 8;
 
@@ -205,12 +180,7 @@ class DA_EXPORT QThrobberWidget : public QWidget {
         Q_PROPERTY(qreal fontSize READ fontSize WRITE setFontSize NOTIFY fontSizeChanged FINAL)
         Q_PROPERTY(QSize iconSize READ iconSize WRITE setIconSize NOTIFY iconSizeChanged FINAL)
         Q_PROPERTY(QIcon icon READ icon WRITE setIcon NOTIFY iconChanged FINAL)
-        Q_PROPERTY(qreal throbberRotation READ throbberRotation WRITE setThrobberRotation NOTIFY throbberRotationChanged FINAL)
-        Q_PROPERTY(qreal innerThrobberRotation READ innerThrobberRotation WRITE setInnerThrobberRotation NOTIFY innerThrobberRotationChanged FINAL)
         Q_PROPERTY(bool isPlaying READ isPlaying WRITE setIsPlaying NOTIFY isPlayingChanged FINAL)
-        Q_PROPERTY(qreal throbberLength READ throbberLength WRITE setThrobberLength NOTIFY throbberLengthChanged FINAL)
-        Q_PROPERTY(qreal iconScale READ iconScale WRITE setIconScale NOTIFY iconScaleChanged FINAL)
-        Q_PROPERTY(qreal iconOpacity READ iconOpacity WRITE setIconOpacity NOTIFY iconOpacityChanged FINAL)
         Q_PROPERTY(QColor throbberColor READ throbberColor WRITE setThrobberColor NOTIFY throbberColorChanged FINAL)
         Q_PROPERTY(QPen throbberPen READ throbberPen WRITE setThrobberPen NOTIFY throbberPenChanged FINAL)
         Q_PROPERTY(int throbberWidth READ throbberWidth WRITE setThrobberWidth NOTIFY throbberWidthChanged FINAL)

@@ -14,6 +14,7 @@
 #include <QPropertyAnimation>
 
 #include "dalib_global.h"
+#include "qmaskedbuttonprivate.h"
 
 class DA_EXPORT QMaskedButton : public QWidget
 {
@@ -53,27 +54,12 @@ class DA_EXPORT QMaskedButton : public QWidget
         virtual void mouseReleaseEvent(QMouseEvent *event);
         virtual void paintEvent(QPaintEvent *event);
 
-        qreal hoverOpacity() const
-        {
-            return m_hoverOpacity;
-        }
-
-        qreal clickOpacity() const
-        {
-            return m_clickOpacity;
-        }
-
-        qreal opacity() const
-        {
-            return m_opacity;
-        }
-
     protected slots:
         void onClickTimerTimeout();
 
-        void setHoverOpacity(qreal hoverOpacity);
-        void setClickOpacity(qreal clickOpacity);
-        void setOpacity(qreal opacity);
+        void onHoverOpacityChanged();
+        void onClickOpacityChanged();
+        void onOpacityChanged();
 
     signals:
         void clicked(QMaskedButton *button);
@@ -89,6 +75,8 @@ class DA_EXPORT QMaskedButton : public QWidget
         void clickPixmapChanged();
 
     private:
+        QMaskedButtonPrivate *m_private = nullptr;
+
         bool m_pressed = false;
         bool m_longPressed = false;
         bool m_hover = false;
@@ -104,10 +92,6 @@ class DA_EXPORT QMaskedButton : public QWidget
         QBitmap m_hoverMask;
         QBitmap m_clickMask;
 
-        qreal m_hoverOpacity = 0.0;
-        qreal m_clickOpacity = 0.0;
-        qreal m_opacity = 1.0;
-
         QPropertyAnimation *m_hoverAnimation = nullptr;
         QPropertyAnimation *m_clickAnimation = nullptr;
         QPropertyAnimation *m_pixmapAnimation = nullptr;
@@ -115,9 +99,6 @@ class DA_EXPORT QMaskedButton : public QWidget
         Q_PROPERTY(QPixmap pixmap READ pixmap WRITE setPixmap NOTIFY pixmapChanged FINAL)
         Q_PROPERTY(QPixmap hoverPixmap READ hoverPixmap WRITE setHoverPixmap NOTIFY hoverPixmapChanged FINAL)
         Q_PROPERTY(QPixmap clickPixmap READ clickPixmap WRITE setClickPixmap NOTIFY clickPixmapChanged FINAL)
-        Q_PROPERTY(qreal hoverOpacity READ hoverOpacity WRITE setHoverOpacity)
-        Q_PROPERTY(qreal clickOpacity READ clickOpacity WRITE setClickOpacity)
-        Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
 };
 
 #endif // QMASKEDBUTTON_H

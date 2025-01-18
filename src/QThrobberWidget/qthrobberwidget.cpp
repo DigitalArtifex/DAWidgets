@@ -4,16 +4,23 @@
 QThrobberWidget::QThrobberWidget(QWidget *parent)
     : QWidget(parent)
 {
-    m_throbberRotationAnimation = new QPropertyAnimation(this, "throbberRotation");
+    m_private = new QThrobberWidgetPrivate(this);
+    connect(m_private, SIGNAL(innerThrobberRotationChanged()), this, SLOT(onInnerThrobberRotationChanged()));
+    connect(m_private, SIGNAL(iconOpacityChanged()), this, SLOT(onInnerThrobberRotationChanged()));
+    connect(m_private, SIGNAL(iconScaleChanged()), this, SLOT(onIconScaleChanged()));
+    connect(m_private, SIGNAL(throbberLengthChanged()), this, SLOT(onThrobberLengthChanged()));
+    connect(m_private, SIGNAL(throbberRotationChanged()), this, SLOT(onThrobberRotationChanged()));
+
+    m_throbberRotationAnimation = new QPropertyAnimation(m_private, "throbberRotation");
     m_throbberRotationAnimation->setDuration(10000);
 
-    m_throbberLengthAnimation = new QPropertyAnimation(this, "throbberLength");
+    m_throbberLengthAnimation = new QPropertyAnimation(m_private, "throbberLength");
     m_throbberLengthAnimation->setDuration(5000);
 
-    m_iconOpacityAnimation = new QPropertyAnimation(this, "iconOpacity");
+    m_iconOpacityAnimation = new QPropertyAnimation(m_private, "iconOpacity");
     m_iconOpacityAnimation->setDuration(5000);
 
-    m_iconScaleAnimation = new QPropertyAnimation(this, "iconScale");
+    m_iconScaleAnimation = new QPropertyAnimation(m_private, "iconScale");
     m_iconScaleAnimation->setDuration(5000);
 
     m_animationGroup = new QParallelAnimationGroup(this);
@@ -65,8 +72,8 @@ void QThrobberWidget::paintEvent(QPaintEvent *event)
 
         if(m_iconScaleAnimationEnabled)
         {
-            size.setHeight(size.height() * m_iconScale);
-            size.setWidth(size.width() * m_iconScale);
+            size.setHeight(size.height() * m_private->iconScale());
+            size.setWidth(size.width() * m_private->iconScale());
         }
 
         if((m_iconAlignment & Qt::AlignHCenter) == Qt::AlignHCenter)
@@ -93,7 +100,7 @@ void QThrobberWidget::paintEvent(QPaintEvent *event)
             pixmap = (m_icon.pixmap(size, QIcon::Disabled, QIcon::On));
 
         if(m_iconOpacityAnimationEnabled)
-            painter.setOpacity(m_iconOpacity);
+            painter.setOpacity(m_private->iconOpacity());
 
         painter.drawPixmap(QRect(x, y, size.width(), size.height()), pixmap);
 
@@ -115,7 +122,7 @@ void QThrobberWidget::paintEvent(QPaintEvent *event)
 
     //draw background
     painter.setPen(pen);
-    painter.drawArc(QRectF(m_paddingX, m_paddingY, m_pathRadius - m_throbberWidth, m_pathRadius - m_throbberWidth), m_throbberRotation * 16, (m_throbberLength * 16));
+    painter.drawArc(QRectF(m_paddingX, m_paddingY, m_pathRadius - m_throbberWidth, m_pathRadius - m_throbberWidth), m_private->throbberRotation() * 16, (m_private->throbberLength() * 16));
 
     //draw filler
     painter.setPen(pen);
@@ -383,21 +390,6 @@ void QThrobberWidget::setThrobberColor(const QColor &throbberColor)
     emit throbberColorChanged();
 }
 
-qreal QThrobberWidget::iconOpacity() const
-{
-    return m_iconOpacity;
-}
-
-void QThrobberWidget::setIconOpacity(qreal iconOpacity)
-{
-    if (qFuzzyCompare(m_iconOpacity, iconOpacity))
-        return;
-
-    m_iconOpacity = iconOpacity;
-    update();
-    emit iconOpacityChanged();
-}
-
 void QThrobberWidget::calculateRect()
 {
     if(this->width() > this->height())
@@ -417,41 +409,11 @@ void QThrobberWidget::calculateRect()
     }
 }
 
-qreal QThrobberWidget::iconScale() const
-{
-    return m_iconScale;
-}
-
-void QThrobberWidget::setIconScale(qreal iconScale)
-{
-    if (qFuzzyCompare(m_iconScale, iconScale))
-        return;
-
-    m_iconScale = iconScale;
-    update();
-    emit iconScaleChanged();
-}
-
-qreal QThrobberWidget::throbberLength() const
-{
-    return m_throbberLength;
-}
-
-void QThrobberWidget::setThrobberLength(qreal throbberLength)
-{
-    if (qFuzzyCompare(m_throbberLength, throbberLength))
-        return;
-
-    m_throbberLength = throbberLength;
-    update();
-    emit throbberLengthChanged();
-}
-
 void QThrobberWidget::onSecondaryAnimationGroupFinished()
 {
     if(m_animationGroup->state() != QParallelAnimationGroup::Running)
     {
-        m_throbberLength = -270;
+        m_private->setThrobberLength(-270);
         m_throbberLengthGrowing = false;
         return;
     }
@@ -484,6 +446,31 @@ void QThrobberWidget::onSecondaryAnimationGroupFinished()
     }
 
     m_secondaryAnimationGroup->start();
+}
+
+void QThrobberWidget::onThrobberRotationChanged()
+{
+    update();
+}
+
+void QThrobberWidget::onInnerThrobberRotationChanged()
+{
+    update();
+}
+
+void QThrobberWidget::onThrobberLengthChanged()
+{
+    update();
+}
+
+void QThrobberWidget::onIconScaleChanged()
+{
+    update();
+}
+
+void QThrobberWidget::onIconOpacityChanged()
+{
+    update();
 }
 
 bool QThrobberWidget::isPlaying() const
@@ -524,36 +511,6 @@ void QThrobberWidget::setIsPlaying(bool isPlaying)
         m_animationGroup->stop();
         m_secondaryAnimationGroup->stop();
     }
-}
-
-qreal QThrobberWidget::innerThrobberRotation() const
-{
-    return m_innerThrobberRotation;
-}
-
-void QThrobberWidget::setInnerThrobberRotation(qreal innerThrobberRotation)
-{
-    if (qFuzzyCompare(m_innerThrobberRotation, innerThrobberRotation))
-        return;
-
-    m_innerThrobberRotation = innerThrobberRotation;
-    update();
-    emit innerThrobberRotationChanged();
-}
-
-qreal QThrobberWidget::throbberRotation() const
-{
-    return m_throbberRotation;
-}
-
-void QThrobberWidget::setThrobberRotation(qreal throbberRotation)
-{
-    if (qFuzzyCompare(m_throbberRotation, throbberRotation))
-        return;
-
-    m_throbberRotation = throbberRotation;
-    update();
-    emit throbberRotationChanged();
 }
 
 QIcon QThrobberWidget::icon() const

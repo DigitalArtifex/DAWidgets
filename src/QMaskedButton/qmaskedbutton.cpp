@@ -3,17 +3,23 @@
 QMaskedButton::QMaskedButton(QWidget *parent)
     : QWidget{parent}
 {
-    m_hoverAnimation = new QPropertyAnimation(this, "hoverOpacity");
+    m_private = new QMaskedButtonPrivate(this);
+
+    connect(m_private, SIGNAL(clickOpacityChanged()), this, SLOT(onClickOpacityChanged()));
+    connect(m_private, SIGNAL(hoverOpacityChanged()), this, SLOT(onHoverOpacityChanged()));
+    connect(m_private, SIGNAL(opacityChanged()), this, SLOT(onOpacityChanged()));
+
+    m_hoverAnimation = new QPropertyAnimation(m_private, "hoverOpacity");
     m_hoverAnimation->setStartValue(0.0);
     m_hoverAnimation->setEndValue(1.0);
     m_hoverAnimation->setDuration(100);
 
-    m_clickAnimation = new QPropertyAnimation(this, "clickOpacity");
+    m_clickAnimation = new QPropertyAnimation(m_private, "clickOpacity");
     m_clickAnimation->setStartValue(0.0);
     m_clickAnimation->setEndValue(1.0);
     m_clickAnimation->setDuration(100);
 
-    m_pixmapAnimation = new QPropertyAnimation(this, "opacity");
+    m_pixmapAnimation = new QPropertyAnimation(m_private, "opacity");
     m_pixmapAnimation->setStartValue(1.0);
     m_pixmapAnimation->setEndValue(0.0);
     m_pixmapAnimation->setDuration(100);
@@ -37,30 +43,18 @@ void QMaskedButton::onClickTimerTimeout()
         setProperty("longPressed", true);
 }
 
-void QMaskedButton::setOpacity(qreal opacity)
+void QMaskedButton::onHoverOpacityChanged()
 {
-    if (qFuzzyCompare(m_opacity, opacity))
-        return;
-    m_opacity = opacity;
-
     update();
 }
 
-void QMaskedButton::setClickOpacity(qreal clickOpacity)
+void QMaskedButton::onClickOpacityChanged()
 {
-    if (qFuzzyCompare(m_clickOpacity, clickOpacity))
-        return;
-    m_clickOpacity = clickOpacity;
-
     update();
 }
 
-void QMaskedButton::setHoverOpacity(qreal hoverOpacity)
+void QMaskedButton::onOpacityChanged()
 {
-    if (qFuzzyCompare(m_hoverOpacity, hoverOpacity))
-        return;
-    m_hoverOpacity = hoverOpacity;
-
     update();
 }
 
@@ -119,11 +113,11 @@ void QMaskedButton::mousePressEvent(QMouseEvent *event)
         if(m_hoverAnimation->state() == QPropertyAnimation::Running)
             m_hoverAnimation->stop();
 
-        m_clickAnimation->setStartValue(m_clickOpacity);
+        m_clickAnimation->setStartValue(m_private->clickOpacity());
         m_clickAnimation->setEndValue(1.0);
         m_clickAnimation->start();
 
-        m_hoverAnimation->setStartValue(m_hoverOpacity);
+        m_hoverAnimation->setStartValue(m_private->hoverOpacity());
         m_hoverAnimation->setEndValue(0.0);
         m_hoverAnimation->start();
 
@@ -149,11 +143,11 @@ void QMaskedButton::mouseReleaseEvent(QMouseEvent *event)
         if(m_hoverAnimation->state() == QPropertyAnimation::Running)
             m_hoverAnimation->stop();
 
-        m_clickAnimation->setStartValue(m_clickOpacity);
+        m_clickAnimation->setStartValue(m_private->clickOpacity());
         m_clickAnimation->setEndValue(0.0);
         m_clickAnimation->start();
 
-        m_hoverAnimation->setStartValue(m_hoverOpacity);
+        m_hoverAnimation->setStartValue(m_private->hoverOpacity());
         m_hoverAnimation->setEndValue(1.0);
         m_hoverAnimation->start();
 
@@ -205,11 +199,11 @@ void QMaskedButton::paintEvent(QPaintEvent *event)
     }
     else
     {
-        painter.setOpacity(m_opacity);
+        painter.setOpacity(m_private->opacity());
         painter.drawPixmap(m_pixmap.rect(), m_pixmap);
-        painter.setOpacity(m_hoverOpacity);
+        painter.setOpacity(m_private->hoverOpacity());
         painter.drawPixmap(m_hoverPixmap.rect(), m_hoverPixmap);
-        painter.setOpacity(m_clickOpacity);
+        painter.setOpacity(m_private->clickOpacity());
         painter.drawPixmap(m_clickPixmap.rect(), m_clickPixmap);
     }
 
@@ -224,6 +218,7 @@ void QMaskedButton::enterEvent(QEnterEvent *event)
     {
         if(m_hoverAnimation->state() == QPropertyAnimation::Running)
             m_hoverAnimation->stop();
+
         if(m_pixmapAnimation->state() == QPropertyAnimation::Running)
             m_pixmapAnimation->stop();
 
@@ -231,11 +226,11 @@ void QMaskedButton::enterEvent(QEnterEvent *event)
         setProperty("pressed", false);
         setProperty("longPressed", false);
 
-        m_hoverAnimation->setStartValue(m_hoverOpacity);
+        m_hoverAnimation->setStartValue(m_private->hoverOpacity());
         m_hoverAnimation->setEndValue(1.0);
         m_hoverAnimation->start();
 
-        m_pixmapAnimation->setStartValue(m_opacity);
+        m_pixmapAnimation->setStartValue(m_private->opacity());
         m_pixmapAnimation->setEndValue(0.0);
         m_pixmapAnimation->start();
     }
@@ -256,11 +251,11 @@ void QMaskedButton::leaveEvent(QEvent *event)
     setProperty("pressed", false);
     setProperty("longPressed", false);
 
-    m_hoverAnimation->setStartValue(m_hoverOpacity);
+    m_hoverAnimation->setStartValue(m_private->hoverOpacity());
     m_hoverAnimation->setEndValue(0.0);
     m_hoverAnimation->start();
 
-    m_pixmapAnimation->setStartValue(m_opacity);
+    m_pixmapAnimation->setStartValue(m_private->opacity());
     m_pixmapAnimation->setEndValue(1.0);
     m_pixmapAnimation->start();
 

@@ -3,12 +3,14 @@
 QGaugeWidget::QGaugeWidget(QWidget *parent, Mode mode) : QWidget(parent)
 {
     m_mode = mode;
-    m_progress = 0.0;
+    m_private = new QGaugeWidgetPrivate(this);
+    connect(m_private, SIGNAL(displayedValueChanged()), this, SLOT(onDisplayedValueChanged()));
+    connect(m_private, SIGNAL(progressChanged()), this, SLOT(onProgressChanged()));
 
-    m_progressAnimation = new QPropertyAnimation(this, "progress");
+    m_progressAnimation = new QPropertyAnimation(m_private, "progress");
     m_progressAnimation->setDuration(500);
 
-    m_displayedValueAnimation = new QPropertyAnimation(this, "displayedValue");
+    m_displayedValueAnimation = new QPropertyAnimation(m_private, "displayedValue");
     m_displayedValueAnimation->setDuration(500);
 
     m_animationGroup = new QParallelAnimationGroup(this);
@@ -34,17 +36,6 @@ QGaugeWidget::~QGaugeWidget()
 
     if(m_iconMovie)
         delete m_iconMovie;
-}
-
-void QGaugeWidget::setProgress(qreal progress)
-{
-    if (qFuzzyCompare(m_progress, progress))
-        return;
-
-    m_progress = progress;
-    update();
-
-    emit progressChanged();
 }
 
 void QGaugeWidget::paintEvent(QPaintEvent *event)
@@ -121,7 +112,7 @@ void QGaugeWidget::paintEvent(QPaintEvent *event)
 
     //draw filler
     painter.setPen(m_progressBarFillPen);
-    painter.drawArc(QRectF(m_paddingX, m_paddingY, m_pathRadius - m_pathWidth, m_pathRadius - m_pathWidth), 225 * 16, ((270*16) * m_progress) * -1);
+    painter.drawArc(QRectF(m_paddingX, m_paddingY, m_pathRadius - m_pathWidth, m_pathRadius - m_pathWidth), 225 * 16, ((270*16) * m_private->progress()) * -1);
 
     QFont font;
 
@@ -136,11 +127,11 @@ void QGaugeWidget::paintEvent(QPaintEvent *event)
     QString text;
 
     if(m_mode == Percent)
-        text = QString::number(m_progress * 100.00, 'f', 2) + QString("%");
+        text = QString::number(m_private->progress() * 100.00, 'f', 2) + QString("%");
     else if(m_mode == Temperature)
-        text = QString::number(m_displayedValue, 'f', 2) + QString("°");
+        text = QString::number(m_private->displayedValue(), 'f', 2) + QString("°");
     else
-        text = QString::number(m_displayedValue, 'f', 2);
+        text = QString::number(m_private->displayedValue(), 'f', 2);
 
     qreal textWidth = fontMetrics.horizontalAdvance(text);
 
@@ -208,6 +199,8 @@ void QGaugeWidget::setMode(Mode mode)
 
     m_mode = mode;
     emit modeChanged();
+
+    update();
 }
 
 void QGaugeWidget::setTextColor(const QColor &textColor)
@@ -216,6 +209,8 @@ void QGaugeWidget::setTextColor(const QColor &textColor)
         return;
     m_textColor = textColor;
     emit textColorChanged();
+
+    update();
 }
 
 void QGaugeWidget::setProgressBarFillPen(const QPen &progressBarFillPen)
@@ -225,6 +220,8 @@ void QGaugeWidget::setProgressBarFillPen(const QPen &progressBarFillPen)
 
     m_progressBarFillPen = progressBarFillPen;
     emit progressBarFillPenChanged();
+
+    update();
 }
 
 void QGaugeWidget::setProgressBarPen(const QPen &progressBarPen)
@@ -233,6 +230,8 @@ void QGaugeWidget::setProgressBarPen(const QPen &progressBarPen)
         return;
     m_progressBarPen = progressBarPen;
     emit progressBarPenChanged();
+
+    update();
 }
 
 void QGaugeWidget::setProgressBarFillColor(const QColor &progressBarFillColor)
@@ -244,6 +243,8 @@ void QGaugeWidget::setProgressBarFillColor(const QColor &progressBarFillColor)
     m_progressBarFillPen.setColor(m_progressBarColor);
 
     emit progressBarFillColorChanged();
+
+    update();
 }
 
 void QGaugeWidget::setProgressBarColor(const QColor &progressBarColor)
@@ -255,6 +256,8 @@ void QGaugeWidget::setProgressBarColor(const QColor &progressBarColor)
     m_progressBarPen.setColor(m_progressBarColor);
 
     emit progressBarColorChanged();
+
+    update();
 }
 
 void QGaugeWidget::setAnimationsEnabled(bool animationsEnabled)
@@ -293,6 +296,8 @@ void QGaugeWidget::setAnimatedIcon(const QString &animatedIcon)
 
     m_iconMovie->setFileName(animatedIcon);
     m_iconMovie->start();
+
+    update();
 }
 
 void QGaugeWidget::setAnimatedIconEnabled(bool animatedIconEnabled)
@@ -315,20 +320,23 @@ void QGaugeWidget::setPathWidth(int pathWidth)
     m_progressBarFillPen.setWidth(pathWidth - 4);
 
     emit pathWidthChanged();
-}
 
-void QGaugeWidget::setDisplayedValue(qreal displayedValue)
-{
-    if (qFuzzyCompare(m_displayedValue, displayedValue))
-        return;
-
-    m_displayedValue = displayedValue;
-    emit displayedValueChanged();
+    update();
 }
 
 void QGaugeWidget::iconMovieFrameChanged(int frame)
 {
     Q_UNUSED(frame)
+    update();
+}
+
+void QGaugeWidget::onDisplayedValueChanged()
+{
+    update();
+}
+
+void QGaugeWidget::onProgressChanged()
+{
     update();
 }
 
@@ -349,18 +357,18 @@ void QGaugeWidget::setValue(qreal value)
         if(m_animationGroup->state() == QParallelAnimationGroup::Running)
             m_animationGroup->stop();
 
-        m_progressAnimation->setStartValue(m_progress);
+        m_progressAnimation->setStartValue(m_private->progress());
         m_progressAnimation->setEndValue(m_value / m_maximum);
 
-        m_displayedValueAnimation->setStartValue(m_displayedValue);
+        m_displayedValueAnimation->setStartValue(m_private->displayedValue());
         m_displayedValueAnimation->setEndValue(m_value);
 
         m_animationGroup->start();
     }
     else
     {
-        setProgress(m_value / m_maximum);
-        setDisplayedValue(m_value);
+        m_private->setProgress(m_value / m_maximum);
+        m_private->setDisplayedValue(m_value);
     }
 
     emit valueChanged();
@@ -376,7 +384,28 @@ void QGaugeWidget::setMaximum(qreal maximum)
     if(m_minimum == m_maximum)
         m_maximum += 1.0;
 
+    if(m_animationsEnabled)
+    {
+        if(m_animationGroup->state() == QParallelAnimationGroup::Running)
+            m_animationGroup->stop();
+
+        m_progressAnimation->setStartValue(m_private->progress());
+        m_progressAnimation->setEndValue(m_value / m_maximum);
+
+        m_displayedValueAnimation->setStartValue(m_private->displayedValue());
+        m_displayedValueAnimation->setEndValue(m_value);
+
+        m_animationGroup->start();
+    }
+    else
+    {
+        m_private->setProgress(m_value / m_maximum);
+        m_private->setDisplayedValue(m_value);
+    }
+
     emit maximumChanged();
+
+    update();
 }
 
 void QGaugeWidget::setMinimum(qreal minimum)
@@ -385,6 +414,8 @@ void QGaugeWidget::setMinimum(qreal minimum)
         return;
     m_minimum = minimum;
     emit minimumChanged();
+
+    update();
 }
 
 
@@ -393,6 +424,8 @@ void QGaugeWidget::setIcon(const QIcon &icon)
     m_icon = icon;
     update();
     emit iconChanged();
+
+    update();
 }
 
 void QGaugeWidget::setIconSize(const QSize &iconSize)
@@ -401,6 +434,8 @@ void QGaugeWidget::setIconSize(const QSize &iconSize)
         return;
     m_iconSize = iconSize;
     emit iconSizeChanged();
+
+    update();
 }
 
 void QGaugeWidget::setFontSize(qreal fontSize)
@@ -409,6 +444,8 @@ void QGaugeWidget::setFontSize(qreal fontSize)
         return;
     m_fontSize = fontSize;
     emit fontSizeChanged();
+
+    update();
 }
 
 void QGaugeWidget::setBackgroundColor(const QColor &backgroundColor)
@@ -418,4 +455,7 @@ void QGaugeWidget::setBackgroundColor(const QColor &backgroundColor)
 
     m_backgroundColor = backgroundColor;
     emit backgroundColorChanged();
+
+    update();
 }
+

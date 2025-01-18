@@ -5,21 +5,8 @@ QIndicatorWidget::QIndicatorWidget(
 )
     : QWidget{parent}
 {
-    m_indicatorAnimation = new QPropertyAnimation(this, "indicatorOpacity");
-    m_indicatorAnimation->setDuration(150);
-
-    connect(m_indicatorAnimation, SIGNAL(finished()), this, SLOT(onIndicatorOpacityAnimationFinished()));
-}
-
-void QIndicatorWidget::setIndicatorOpacity(qreal indicatorOpacity)
-{
-    if (qFuzzyCompare(m_indicatorOpacity, indicatorOpacity))
-        return;
-
-    m_indicatorOpacity = indicatorOpacity;
-    emit indicatorOpacityChanged();
-
-    update();
+    m_private = new QIndicatorWidgetPrivate(this);
+    connect(m_private, SIGNAL(indicatorOpacityChanged()), this, SLOT(onIndicatorOpacityChanged()));
 }
 
 void QIndicatorWidget::setState(State state)
@@ -32,52 +19,27 @@ void QIndicatorWidget::setState(State state)
     switch(m_state)
     {
         case State::Off:
-            m_indicatorAnimation->setDuration(150);
-            off();
+            m_private->m_indicatorAnimation->setDuration(150);
+            m_private->setIsBlinking(false);
+            m_private->off();
             break;
 
         case State::Blinking:
-            m_indicatorAnimation->setDuration(1000);
-            on();
+            m_private->m_indicatorAnimation->setDuration(1000);
+            m_private->setIsBlinking(true);
+            m_private->on();
             break;
 
         case State::On:
-            on();
+            m_private->m_indicatorAnimation->setDuration(150);
+            m_private->setIsBlinking(false);
+            m_private->on();
             break;
     }
 }
 
-void QIndicatorWidget::onIndicatorOpacityAnimationFinished()
-{
-    if(m_state == State::Blinking && m_indicatorOpacity == 0)
-        on();
-    else if(m_state == State::Blinking && m_indicatorOpacity != 0)
-        off();
-}
-
-void QIndicatorWidget::on()
-{
-    if(m_indicatorAnimation->state() == QPropertyAnimation::Running)
-        m_indicatorAnimation->stop();
-
-    m_indicatorAnimation->setStartValue(0.0);
-    m_indicatorAnimation->setEndValue(1.0);
-    m_indicatorAnimation->start();
-}
-
-void QIndicatorWidget::off()
-{
-    if(m_indicatorAnimation->state() == QPropertyAnimation::Running)
-        m_indicatorAnimation->stop();
-
-    m_indicatorAnimation->setStartValue(1.0);
-    m_indicatorAnimation->setEndValue(0.0);
-    m_indicatorAnimation->start();
-}
-
 void QIndicatorWidget::paintEvent(QPaintEvent *event)
 {
-
     QPainter painter;
 
     painter.begin(this);
@@ -118,7 +80,7 @@ void QIndicatorWidget::paintEvent(QPaintEvent *event)
     QBrush indicatorBrush(indicatorGradient);
 
     painter.setBrush(indicatorBrush);
-    painter.setOpacity(m_indicatorOpacity);
+    painter.setOpacity(m_private->indicatorOpacity());
     painter.drawEllipse(QPoint(width()/2,height()/2), size / 2, size / 2);
 
     painter.end();
@@ -135,10 +97,16 @@ void QIndicatorWidget::setIndicatorBorderColor(const QColor &indicatorBorderColo
     emit indicatorBorderColorChanged();
 }
 
+void QIndicatorWidget::onIndicatorOpacityChanged()
+{
+    update();
+}
+
 void QIndicatorWidget::setIndicatorBorderWidth(qint8 indicatorBorderWidth)
 {
     if (m_indicatorBorderWidth == indicatorBorderWidth)
         return;
+
     m_indicatorBorderWidth = indicatorBorderWidth;
     emit indicatorBorderWidthChanged();
 }
@@ -156,6 +124,7 @@ void QIndicatorWidget::setBroderWidth(qint8 broderWidth)
 {
     if (m_broderWidth == broderWidth)
         return;
+
     m_broderWidth = broderWidth;
     emit broderWidthChanged();
 }

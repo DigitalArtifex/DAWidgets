@@ -5,7 +5,9 @@
 #include <QWidget>
 #include <QPropertyAnimation>
 #include <QPainter>
+
 #include "dalib_global.h"
+#include "qindicatorwidgetprivate.h"
 
 class DA_EXPORT QIndicatorWidget : public QWidget
 {
@@ -19,11 +21,6 @@ class DA_EXPORT QIndicatorWidget : public QWidget
         };
 
         explicit QIndicatorWidget(QWidget *parent = nullptr);
-
-        qreal indicatorOpacity() const
-        {
-            return m_indicatorOpacity;
-        }
 
         State state() const
         {
@@ -66,7 +63,6 @@ class DA_EXPORT QIndicatorWidget : public QWidget
         }
 
     public slots:
-        void setIndicatorOpacity(qreal indicatorOpacity);
 
         void setState(State state);
 
@@ -85,11 +81,9 @@ class DA_EXPORT QIndicatorWidget : public QWidget
         void setIndicatorBorderColor(const QColor &indicatorBorderColor);
 
     protected slots:
-        void onIndicatorOpacityAnimationFinished();
+        void onIndicatorOpacityChanged();
 
     signals:
-
-        void indicatorOpacityChanged();
 
         void stateChanged();
 
@@ -108,11 +102,11 @@ class DA_EXPORT QIndicatorWidget : public QWidget
         void indicatorBorderColorChanged();
 
     protected:
-        void on();
-        void off();
         virtual void paintEvent(QPaintEvent *event) override;
 
     private:
+        QIndicatorWidgetPrivate *m_private = nullptr;
+
         State m_state = State::Off;
 
         QColor m_backgroundColor = QColor(0,0,0,0);
@@ -122,13 +116,11 @@ class DA_EXPORT QIndicatorWidget : public QWidget
 
         QColor m_indicatorBackgroundColor = QColor(0,0,0);
         QColor m_indicatorColor = QColor(48,183,224);
-        qreal m_indicatorOpacity = 0.0;
         qint8 m_indicatorBorderWidth = 2;
         QColor m_indicatorBorderColor = QColor(128,128,128);
 
-        QPropertyAnimation *m_indicatorAnimation = nullptr;
+        Q_ENUM(State)
 
-        Q_PROPERTY(qreal indicatorOpacity READ indicatorOpacity WRITE setIndicatorOpacity NOTIFY indicatorOpacityChanged FINAL)
         Q_PROPERTY(State state READ state WRITE setState NOTIFY stateChanged FINAL)
         Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged FINAL)
         Q_PROPERTY(QColor indicatorColor READ indicatorColor WRITE setIndicatorColor NOTIFY indicatorColorChanged FINAL)

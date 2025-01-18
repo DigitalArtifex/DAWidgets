@@ -13,6 +13,7 @@
 #include <QMovie>
 
 #include "dalib_global.h"
+#include "qgaugewidgetprivate.h"
 
 class DA_EXPORT QGaugeWidget : public QWidget {
         Q_OBJECT
@@ -150,11 +151,9 @@ class DA_EXPORT QGaugeWidget : public QWidget {
 
     protected slots:
 
-        void setProgress(qreal progress);
-
-        void setDisplayedValue(qreal displayedValue);
-
         void iconMovieFrameChanged(int frame);
+        void onDisplayedValueChanged();
+        void onProgressChanged();
 
     signals:
         void backgroundColorChanged();
@@ -196,15 +195,6 @@ class DA_EXPORT QGaugeWidget : public QWidget {
         void modeChanged();
 
     protected:
-        qreal progress() const
-        {
-            return m_progress;
-        }
-
-        qreal displayedValue() const
-        {
-            return m_displayedValue;
-        }
 
         virtual void paintEvent(QPaintEvent *event) override;
         virtual void resizeEvent(QResizeEvent *event) override;
@@ -212,23 +202,18 @@ class DA_EXPORT QGaugeWidget : public QWidget {
         virtual void hideEvent(QHideEvent *event) override;
 
     private:
-        qreal m_progress = 0.0; // progress 0.0 to 1.0
+        QGaugeWidgetPrivate *m_private = nullptr;
+
         qreal m_minimum = 0;
         qreal m_maximum = 100;
         qreal m_value = 0;
-        qreal m_displayedValue = 0; //for animating value text display
 
         QPropertyAnimation *m_progressAnimation = nullptr;
         QPropertyAnimation *m_displayedValueAnimation = nullptr;
         QParallelAnimationGroup *m_animationGroup = nullptr;
 
         Mode m_mode = Percent;
-
-#ifdef QGAUGEWIDGET_DEFAULT_FONT
-        QString m_fontFamily = QGAUGEWIDGET_DEFAULT_FONT;
-#else
         QString m_fontFamily;
-#endif
 
         qreal m_fontSize = 12;
 
@@ -255,15 +240,15 @@ class DA_EXPORT QGaugeWidget : public QWidget {
         QIcon m_icon;
         Qt::Alignment m_iconAlignment = Qt::AlignHCenter | Qt::AlignBottom;
 
+        Q_ENUM(Mode)
+
         Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged FINAL)
         Q_PROPERTY(qreal fontSize READ fontSize WRITE setFontSize NOTIFY fontSizeChanged FINAL)
         Q_PROPERTY(QSize iconSize READ iconSize WRITE setIconSize NOTIFY iconSizeChanged FINAL)
         Q_PROPERTY(QIcon icon READ icon WRITE setIcon NOTIFY iconChanged FINAL)
-        Q_PROPERTY(qreal progress READ progress WRITE setProgress NOTIFY progressChanged FINAL)
         Q_PROPERTY(qreal minimum READ minimum WRITE setMinimum NOTIFY minimumChanged FINAL)
         Q_PROPERTY(qreal maximum READ maximum WRITE setMaximum NOTIFY maximumChanged FINAL)
         Q_PROPERTY(qreal value READ value WRITE setValue NOTIFY valueChanged FINAL)
-        Q_PROPERTY(qreal displayedValue READ displayedValue WRITE setDisplayedValue NOTIFY displayedValueChanged FINAL)
         Q_PROPERTY(int pathWidth READ pathWidth WRITE setPathWidth NOTIFY pathWidthChanged FINAL)
         Q_PROPERTY(bool animatedIconEnabled READ animatedIconEnabled WRITE setAnimatedIconEnabled NOTIFY animatedIconEnabledChanged FINAL)
         Q_PROPERTY(QString animatedIcon READ animatedIcon WRITE setAnimatedIcon NOTIFY animatedIconChanged FINAL)
