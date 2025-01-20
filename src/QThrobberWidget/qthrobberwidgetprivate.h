@@ -2,10 +2,11 @@
 #define QTHROBBERWIDGETPRIVATE_H
 
 #include <QObject>
+#include "dalib_global.h"
 
 class QThrobberWidget;
 
-class QThrobberWidgetPrivate : public QObject
+class DA_EXPORT QThrobberWidgetPrivate : public QObject
 {
         Q_OBJECT
         friend QThrobberWidget;

@@ -4,8 +4,9 @@
 #include <QObject>
 
 class QMaskedButton;
+#include "dalib_global.h"
 
-class QMaskedButtonPrivate : public QObject
+class DA_EXPORT QMaskedButtonPrivate : public QObject
 {
         Q_OBJECT
         friend class QMaskedButton;

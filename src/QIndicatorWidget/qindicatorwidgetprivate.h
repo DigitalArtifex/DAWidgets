@@ -3,10 +3,11 @@
 
 #include <QObject>
 #include <QPropertyAnimation>
+#include "dalib_global.h"
 
 class QIndicatorWidget;
 
-class QIndicatorWidgetPrivate : public QObject
+class DA_EXPORT QIndicatorWidgetPrivate : public QObject
 {
         Q_OBJECT
 

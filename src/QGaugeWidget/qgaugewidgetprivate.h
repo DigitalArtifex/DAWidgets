@@ -4,10 +4,11 @@
 #include <QObject>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
+#include "dalib_global.h"
 
 class QGaugeWidget;
 
-class QGaugeWidgetPrivate : public QObject
+    class DA_EXPORT QGaugeWidgetPrivate : public QObject
 {
         Q_OBJECT
         friend QGaugeWidget;
