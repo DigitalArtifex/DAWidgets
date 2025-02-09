@@ -78,7 +78,7 @@ QString QGaugeWidgetPlugin::group() const
 
 QString QGaugeWidgetPlugin::includeFile() const
 {
-    return u"DigitalArtifexWidgets/qgaugewidget.h"_s;
+    return u"QtDAWidgets/qgaugewidget.h"_s;
 }
 
 QWidget *QGaugeWidgetPlugin::createWidget(QWidget *parent)

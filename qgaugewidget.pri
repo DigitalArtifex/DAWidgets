@@ -1,4 +1,3 @@
-CONFIG      += plugin debug_and_release
 HEADERS += src/QGaugeWidget/qgaugewidget.h \
     $$PWD/src/QGaugeWidget/qgaugewidgetprivate.h
 SOURCES += src/QGaugeWidget/qgaugewidget.cpp \

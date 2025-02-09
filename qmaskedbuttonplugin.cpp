@@ -78,7 +78,7 @@ QString QMaskedButtonPlugin::group() const
 
 QString QMaskedButtonPlugin::includeFile() const
 {
-    return u"DigitalArtifexWidgets/qmaskedbutton.h"_s;
+    return u"QtDAWidgets/qmaskedbutton.h"_s;
 }
 
 QWidget *QMaskedButtonPlugin::createWidget(QWidget *parent)

@@ -78,7 +78,7 @@ QString QIndicatorWidgetPlugin::group() const
 
 QString QIndicatorWidgetPlugin::includeFile() const
 {
-    return u"DigitalArtifexWidgets/qindicatorwidget.h"_s;
+    return u"QtDAWidgets/qindicatorwidget.h"_s;
 }
 
 QWidget *QIndicatorWidgetPlugin::createWidget(QWidget *parent)

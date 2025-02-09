@@ -1,4 +1,3 @@
-CONFIG      += plugin debug_and_release
 HEADERS     += src/QIndicatorWidget/qindicatorwidget.h \
     $$PWD/src/QIndicatorWidget/qindicatorwidgetprivate.h
 SOURCES     += src/QIndicatorWidget/qindicatorwidget.cpp \

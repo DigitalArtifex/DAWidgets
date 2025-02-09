@@ -78,7 +78,7 @@ QString QThrobberWidgetPlugin::group() const
 
 QString QThrobberWidgetPlugin::includeFile() const
 {
-    return u"DigitalArtifexWidgets/qthrobberwidget.h"_s;
+    return u"QtDAWidgets/qthrobberwidget.h"_s;
 }
 
 QWidget *QThrobberWidgetPlugin::createWidget(QWidget *parent)
